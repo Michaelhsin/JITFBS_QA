@@ -1,0 +1,40 @@
+{
+  "default": "intro.md",
+  "groups": [
+    {
+      "title": "總覽",
+      "items": [
+        {
+          "title": "導覽與使用方式",
+          "path": "intro.md"
+        }
+      ]
+    },
+    {
+      "title": "JIT",
+      "items": [
+        {
+          "title": "JIT 概念與流程",
+          "path": "JIT/overview.md"
+        },
+        {
+          "title": "JIT 作業常見問題",
+          "path": "JIT/operations.md"
+        }
+      ]
+    },
+    {
+      "title": "FBS",
+      "items": [
+        {
+          "title": "FBS 概觀",
+          "path": "FBS/overview.md"
+        },
+        {
+          "title": "FBS 常見問題（FAQ）",
+          "path": "FBS/faq.md"
+        }
+      ]
+    }
+  ]
+}
