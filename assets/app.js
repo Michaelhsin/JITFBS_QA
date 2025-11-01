@@ -3,6 +3,35 @@
   const navEl = document.getElementById('sidebarNav') || document.createElement('div');
   const themeToggle = document.getElementById('themeToggle');
   const htmlEl = document.documentElement;
+  // === Sidebar 收合/展開 ===
+  document.addEventListener('DOMContentLoaded', () => {
+    const layout = document.querySelector('.layout');
+    const sidebar = document.querySelector('.sidebar');
+    const actions = document.querySelector('.actions');
+
+    if (!layout || !sidebar || !actions) return;
+
+    // 建立按鈕（放在右上角 actions 區，與 🌗 並排）
+    const btn = document.createElement('button');
+    btn.id = 'sidebarToggle';
+    btn.title = '收合/展開側欄';
+    btn.textContent = '⟨⟩';           // 你要可改成「≡」或「⮜ / ⮞」
+    actions.prepend(btn);
+
+    // 還原上次狀態
+    const KEY = 'sidebarCollapsed';
+    const collapsed = localStorage.getItem(KEY) === '1';
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+    btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+
+    // 點擊切換
+    btn.addEventListener('click', () => {
+      const willCollapse = !document.body.classList.contains('sidebar-collapsed');
+      document.body.classList.toggle('sidebar-collapsed', willCollapse);
+      localStorage.setItem(KEY, willCollapse ? '1' : '0');
+      btn.setAttribute('aria-pressed', willCollapse ? 'true' : 'false');
+    });
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     const brand = document.querySelector('.brand');

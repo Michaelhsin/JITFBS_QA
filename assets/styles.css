@@ -285,3 +285,32 @@ a:hover{ text-decoration: underline; }
   text-decoration: none;
   color: var(--fg);
 }
+/* ==== 整個側欄的收合狀態 ==== */
+.layout {
+  transition: grid-template-columns 0.2s ease;
+}
+body.sidebar-collapsed .layout {
+  grid-template-columns: 0 1fr;     /* 直接把左欄寬度壓成 0 */
+}
+
+/* 收合時隱藏側欄與邊框、內距 */
+body.sidebar-collapsed .sidebar {
+  padding: 0;
+  border: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* 右上角的收合按鈕造型（和主題按鈕一致風格） */
+#sidebarToggle {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 8px;   /* 放在 🌗 左邊 */
+}
+#sidebarToggle:hover {
+  background: rgba(127,127,127,.08);
+}
