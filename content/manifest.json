@@ -1,39 +1,28 @@
 {
-  "default": "intro.md",
+  "default": "introoverview.md",
   "groups": [
     {
       "title": "總覽",
       "items": [
-        {
-          "title": "導覽與使用方式",
-          "path": "intro.md"
-        }
+        { "title": "整體導覽", "path": "introoverview.md" }
       ]
     },
     {
-      "title": "JIT",
+      "title": "Pre-sort\n初分揀",
       "items": [
-        {
-          "title": "JIT 概念與流程",
-          "path": "JIT/overview.md"
-        },
-        {
-          "title": "JIT 作業常見問題",
-          "path": "JIT/operations.md"
-        }
+        { "title": "Pre-sort 流程與異常SOP", "path": "Pre-sort/overview.md" }
       ]
     },
     {
-      "title": "FBS",
+      "title": "分貨",
       "items": [
-        {
-          "title": "FBS 概觀",
-          "path": "FBS/overview.md"
-        },
-        {
-          "title": "FBS 常見問題（FAQ）",
-          "path": "FBS/faq.md"
-        }
+        { "title": "分貨 流程與異常SOP", "path": "分貨/overview.md" }
+      ]
+    },
+    {
+      "title": "Main-sort\n主分揀",
+      "items": [
+        { "title": "Main-sort 流程與異常SOP", "path": "Main-sort/overview.md" }
       ]
     }
   ]

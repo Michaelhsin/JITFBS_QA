@@ -1,65 +1,287 @@
+/* ==========================================================================
+   0) 主題色票與「可調旋鈕」
+   - 想改 H1/H2/H3 字級 → 只要調 --h1 / --h2 / --h3
+   - 想改流程圖配色 → 調 --flow-bg / --flow-border
+   - 想改整體圓角與間距 → 調 --radius / --space-*
+   -------------------------------------------------------------------------- */
 :root{
-  --bg: #ffffff;
-  --fg: #111111;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --accent:#2563eb;
-  --sidebar-bg:#fafafa;
+  /* 亮色主題基底 */
+  --bg: #ffffff;        /* 背景 */
+  --fg: #111111;        /* 文字 */
+  --muted: #6b7280;     /* 次要文字 */
+  --border: #e5e7eb;    /* 邊界線 */
+  --accent: #2563eb;    /* 連結/強調色 */
+  --sidebar-bg: #fafafa;/* 側欄底色 */
+
+  /* 版面節奏（Spacing / Radius） */
+  --radius: 10px;
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 20px;
+  --space-5: 24px;
+
+  /* ====== 字級旋鈕（這三個就是 H1/H2/H3 的大小）====== */
+  --h1: 2.4rem;   /* # 大標題：預設約 38px */
+  --h2: 1.7rem;   /* ## 次標題：預設約 27px */
+  --h3: 1.3rem;   /* ### 小標題：預設約 21px */
+
+  /* 流程圖（flow code block）配色 */
+  --flow-bg: #fffaf4;         /* 背景（淺橘） */
+  --flow-border: #f69113;     /* 邊框（品牌橘） */
 }
+
+/* 暗色主題覆蓋（不需動這裡） */
 :root[data-theme="dark"]{
-  --bg:#0b0e12;
-  --fg:#e5e7eb;
-  --muted:#9aa3af;
-  --border:#273141;
-  --accent:#60a5fa;
-  --sidebar-bg:#0f141b;
+  --bg: #0b0e12;
+  --fg: #e5e7eb;
+  --muted: #9aa3af;
+  --border: #273141;
+  --accent: #60a5fa;
+  --sidebar-bg: #0f141b;
+
+  --flow-bg: rgba(246,145,19,.08);
+  --flow-border: #f69113;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
+/* ==========================================================================
+   1) 全域
+   -------------------------------------------------------------------------- */
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
 body{
-  margin:0; background:var(--bg); color:var(--fg);
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC","Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";
-  line-height:1.6;
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,
+               "Noto Sans TC","Helvetica Neue",Arial,
+               "Apple Color Emoji","Segoe UI Emoji";
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-a{color:var(--accent); text-decoration:none}
-a:hover{text-decoration:underline}
+a{ color: var(--accent); text-decoration: none; }
+a:hover{ text-decoration: underline; }
 
+/* ==========================================================================
+   2) 頂欄（Topbar）
+   -------------------------------------------------------------------------- */
 .topbar{
-  position:sticky; top:0; z-index:10;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:10px 14px; border-bottom:1px solid var(--border); background:var(--bg);
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
-.brand{display:flex; align-items:center; gap:10px; font-weight:600}
-.logo{width:24px; height:24px}
+.brand{ display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.logo{ width: 24px; height: 24px; }
+#themeToggle{
+  border: 1px solid var(--border);
+  background: transparent; color: var(--fg);
+  padding: 6px 10px; border-radius: 8px; cursor: pointer;
+}
 
+/* ==========================================================================
+   3) 版面（Sidebar + Content）
+   -------------------------------------------------------------------------- */
 .layout{
-  display:grid; grid-template-columns: 280px 1fr; gap:0; min-height:calc(100vh - 52px);
+  display: grid; grid-template-columns: 280px 1fr; gap: 0;
+  min-height: calc(100vh - 52px); /* 扣掉頂欄高度 */
 }
 .sidebar{
-  border-right:1px solid var(--border); background:var(--sidebar-bg);
-  padding:14px; overflow:auto
+  border-right: 1px solid var(--border);
+  background: var(--sidebar-bg);
+  padding: 14px; overflow: auto;
 }
-.content{padding:22px; min-width:0}
-.loading{color:var(--muted)}
+.content{ padding: 22px; min-width: 0; } /* min-width:0 防止撐破 */
+.loading{ color: var(--muted); }
 
-.nav-group{margin-bottom:18px}
-.nav-group-title{font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin:8px 0}
+/* 側欄清單 */
+.nav-group{ margin-bottom: 18px; }
+.nav-group-title{
+  font-size: 13px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .08em; margin: 8px 0;
+}
 .nav-item{
-  display:block; padding:6px 8px; border-radius:8px; color:var(--fg);
+  display: block; padding: 6px 8px; border-radius: 8px; color: var(--fg);
 }
-.nav-item.active, .nav-item:hover{background:rgba(127,127,127,.08)}
+.nav-item.active, .nav-item:hover{ background: rgba(127,127,127,.08); }
 
-.content h1,h2,h3{margin-top:1.4em}
-.content img, .content iframe{max-width:100%; height:auto; border-radius:8px}
-.content pre{background: #0f172a; color: #e2e8f0; padding:14px; border-radius:10px; overflow:auto}
-.content code:not(pre code){background:rgba(127,127,127,.15); padding:2px 6px; border-radius:6px}
-
-#themeToggle{
-  border:1px solid var(--border); background:transparent; color:var(--fg);
-  padding:6px 10px; border-radius:8px; cursor:pointer;
+/* ==========================================================================
+   4) 文章通用樣式（圖片 / 行內程式碼 / 一般 code block）
+   -------------------------------------------------------------------------- */
+.content img, .content iframe{
+  max-width: 100%; height: auto; border-radius: var(--radius);
 }
+.content code:not(pre code){            /* 行內小片段 `code` */
+  background: rgba(127,127,127,.15); padding: 2px 6px; border-radius: 6px;
+}
+:root[data-theme="dark"] .content code:not(pre code){
+  background: rgba(255,255,255,.12);  /* 暗色降低透明度 */
+}
+
+/* 一般 code block（非 flow） */
+.content pre{
+  background: #0f172a; color: #e2e8f0;
+  padding: 14px; border-radius: var(--radius);
+  overflow: auto; margin: var(--space-4) 0;
+  font-size: 1rem; line-height: 1.5;
+}
+
+/* ==========================================================================
+   5) 表格（有邊框 + 不被長字撐爆）
+   -------------------------------------------------------------------------- */
+.content table{
+  width: 100%; table-layout: fixed;        /* 固定欄寬，避免長字撐爆 */
+  border-collapse: collapse;
+  border: 1px solid var(--border);         /* 外框線跟著主題變色 */
+  margin: var(--space-4) 0;
+}
+.content th, .content td{
+  border: 1px solid var(--border);         /* 每格線條 */
+  padding: 6px 10px; text-align: left;
+  word-break: break-word; white-space: normal;
+  color: var(--fg);                         /* 文字跟著主題色 */
+}
+/* 表頭底色：亮/暗主題各自維持對比 */
+.content th{ background: #f5f5f5; }
+:root[data-theme="dark"] .content th{ background: #111827; }
+
+/* 摺疊詳情區 */
+.content details{ margin: 8px 0 16px; }
+
+/* ==========================================================================
+   6) 流程圖（flow code block 為主；flow-block 為備援）
+   -------------------------------------------------------------------------- */
+/* 推薦寫法：```flow fenced code block */
+.content pre code.language-flow{
+  display: block;
+  background: var(--flow-bg);
+  border: 2px solid var(--flow-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 1.15rem;          /* 流程圖字大一點 */
+  line-height: 1.8;
+  white-space: pre-wrap; word-break: break-word;
+  color: var(--fg);             /* 文字顏色跟主題 */
+}
+/* 自動加「流程圖：」標籤 */
+.content pre code.language-flow::before{
+  content: "流程圖：";
+  display: block; font-weight: 700; margin-bottom: 8px; color: var(--flow-border);
+}
+/* 外層 pre 去底色（瀏覽器若不支援 :has，拿掉也不影響可讀） */
+.content pre:has(code.language-flow){
+  background: transparent; border: none; padding: 0; margin: var(--space-5) 0;
+}
+
+/* 備援寫法：<div class="flow-block"> 包 code block */
+.flow-block{
+  background: var(--flow-bg);
+  border: 2px solid var(--flow-border);
+  border-radius: var(--radius);
+  padding: 16px 20px; margin: var(--space-5) 0;
+}
+.flow-block pre{
+  background: transparent; border: none; padding: 0;
+  font-size: 1.15rem; line-height: 1.8; white-space: pre-wrap; word-break: break-word;
+}
+.flow-block strong{
+  display: block; color: var(--flow-border); font-size: 1.1rem; margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   7) 標題（H1~H3）
+   - 想調大小：改上面變數 --h1 / --h2 / --h3 即可
+   -------------------------------------------------------------------------- */
+.content h1, .content h2, .content h3{ margin-top: 1.4em; color: var(--fg); }
+.content h1{
+  font-size: var(--h1);
+  margin-top: 50px; margin-bottom: 20px;
+  font-weight: 800;
+}
+.content h2{
+  font-size: var(--h2);
+  margin-top: 28px; margin-bottom: 16px;
+  font-weight: 600;
+}
+.content h3{
+  font-size: var(--h3);
+  margin-top: 24px; margin-bottom: 12px;
+  font-weight: 600;
+}
+/* 若想讓 H1/H2 用品牌橘色：取消下一行註解即可 */
+/* .content h1, .content h2{ color: var(--flow-border); } */
+
+/* ==========================================================================
+   8) Dify 對話泡泡
+   -------------------------------------------------------------------------- */
+#dify-chatbot-bubble-button{ animation: popIn .3s ease-out; }
+:root[data-theme="dark"] #dify-chatbot-bubble-button{
+  filter: brightness(1.1) saturate(1.1);
+}
+#dify-chatbot-bubble-window{
+  width: 24rem !important; height: 40rem !important;
+}
+@keyframes popIn{ from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+
+/* ==========================================================================
+   9) RWD
+   -------------------------------------------------------------------------- */
 @media (max-width: 900px){
-  .layout{grid-template-columns: 1fr}
-  .sidebar{position:sticky; top:52px}
+  .layout{ grid-template-columns: 1fr; }
+  .sidebar{ position: sticky; top: 52px; }
+}
+/* 摺疊群組的外觀與箭頭 */
+.nav-group-title.collapsible {
+  cursor: pointer;
+  position: relative;
+  padding-right: 18px;
+}
+.nav-group-title.collapsible::after {
+  content: "▸";
+  position: absolute;
+  right: 0; top: 0;
+  color: var(--muted);
+  transition: transform .2s ease;
+}
+.nav-group-title.collapsible.open::after {
+  transform: rotate(90deg);
+}
+.nav-group-items { margin-left: 0; }
+/* ==== 側欄群組標題==== */
+.nav-group-title {
+  font-size: 1.1rem;           /* 原本約 13px，現在變大 */
+  font-weight: 700;            /* 加粗 */
+  color: var(--fg);            /* 用主文字色，亮暗主題都可讀 */
+  margin: 12px 0 6px;
+  text-transform: none;        /* 移除全大寫 */
+  letter-spacing: 0.02em;      /* 稍微增加間距 */
+}
+
+/* 若想讓群組之間更明顯分隔，可加底線或背景 */
+/* .nav-group {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+} */
+
+/* 摺疊箭頭顯示更清楚 */
+.nav-group-title.collapsible::after {
+  content: "▸";
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: var(--flow-border);    /* 改為主題色強調箭頭 */
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+.nav-group-title.collapsible.open::after {
+  transform: rotate(90deg);
+}
+/* 標題可點 */
+.brand {
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--fg);
 }

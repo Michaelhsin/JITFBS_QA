@@ -20,18 +20,45 @@
     </div>
   </header>
 
-  <main class="layout">
-    <aside class="sidebar">
-      <nav id="sidebarNav">載入目錄中…</nav>
-    </aside>
-
-    <article id="content" class="content">
-      <div class="loading">載入內容中…</div>
-    </article>
-  </main>
+<div class="layout">
+  <aside class="sidebar" id="sidebarNav"></aside>
+  <main class="content" id="content"></main>
+</div>
 
   <!-- 依賴：Marked 將 Markdown 轉 HTML -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="./assets/app.js"></script>
+  <!-- Dify Chatbot embed（貼在 </body> 前） -->
+<script>
+  window.difyChatbotConfig = {
+    token: 'QtJjyZNfith51lD3',
+    inputs: {
+      // e.g. name: "NAME"
+    },
+    systemVariables: {
+      // user_id: 'custom-user-id',
+      // conversation_id: 'valid-uuid',
+    },
+    userVariables: {
+      // avatar_url: 'https://...',
+      // name: '使用者名稱',
+    },
+  };
+</script>
+<script src="https://udify.app/embed.min.js" id="QtJjyZNfith51lD3" defer></script>
+<style>
+  /* 外觀可自訂 */
+  #dify-chatbot-bubble-button {
+    background-color: #ff7337 !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(246,145,19,0.4) !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+    z-index: 9999 !important; /* 確保浮在頁面元件之上 */
+  }
+</style>
+
 </body>
 </html>
