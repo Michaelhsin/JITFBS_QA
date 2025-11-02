@@ -3,6 +3,7 @@
    - 想改 H1/H2/H3 字級 → 只要調 --h1 / --h2 / --h3
    - 想改流程圖配色 → 調 --flow-bg / --flow-border
    - 想改整體圓角與間距 → 調 --radius / --space-*
+   - 想改頂欄高度 → 調 --topbar-h
    -------------------------------------------------------------------------- */
 :root{
   /* 亮色主題基底 */
@@ -21,17 +22,20 @@
   --space-4: 20px;
   --space-5: 24px;
 
-  /* ====== 字級旋鈕（這三個就是 H1/H2/H3 的大小）====== */
-  --h1: 2.4rem;   /* # 大標題：預設約 38px */
-  --h2: 1.7rem;   /* ## 次標題：預設約 27px */
-  --h3: 1.3rem;   /* ### 小標題：預設約 21px */
+  /* 字級旋鈕（H1/H2/H3） */
+  --h1: 2.4rem;   /* # 大標題 */
+  --h2: 1.7rem;   /* ## 次標題 */
+  --h3: 1.3rem;   /* ### 小標題 */
 
-  /* 流程圖（flow code block）配色 */
+  /* 流程圖配色 */
   --flow-bg: #fffaf4;         /* 背景（淺橘） */
   --flow-border: #f69113;     /* 邊框（品牌橘） */
+
+  /* 頂欄高度（統一控制 topbar / sidebar 對齊） */
+  --topbar-h: 56px;
 }
 
-/* 暗色主題覆蓋（不需動這裡） */
+/* 暗色主題覆蓋 */
 :root[data-theme="dark"]{
   --bg: #0b0e12;
   --fg: #e5e7eb;
@@ -65,15 +69,20 @@ a:hover{ text-decoration: underline; }
 
 /* ==========================================================================
    2) 頂欄（Topbar）
+   - 固定在最上方，不隨右側內容滾動而消失
    -------------------------------------------------------------------------- */
 .topbar{
-  position: sticky; top: 0; z-index: 10;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px;
+  height: var(--topbar-h);
+  padding: 0 14px;                 /* 高度用 height 控，padding 調左右距 */
   border-bottom: 1px solid var(--border);
   background: var(--bg);
+  box-shadow: 0 1px 0 var(--border); /* 細分隔線陰影 */
 }
-.brand{ display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.brand{ display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; color: var(--fg); text-decoration: none; }
 .logo{ width: 24px; height: 24px; }
 #themeToggle{
   border: 1px solid var(--border);
@@ -83,29 +92,46 @@ a:hover{ text-decoration: underline; }
 
 /* ==========================================================================
    3) 版面（Sidebar + Content）
+   - layout 的最小高度扣掉頂欄，避免頁面底部留白
    -------------------------------------------------------------------------- */
 .layout{
-  display: grid; grid-template-columns: 280px 1fr; gap: 0;
-  min-height: calc(100vh - 52px); /* 扣掉頂欄高度 */
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  min-height: calc(100vh - var(--topbar-h)); /* 扣掉頂欄高度 */
 }
 .sidebar{
   border-right: 1px solid var(--border);
   background: var(--sidebar-bg);
-  padding: 14px; overflow: auto;
+  padding: 14px;
+  /* 固定在頂欄下方，左欄有自己的卷軸，不跟右邊一起捲 */
+  position: sticky;
+  top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+  overflow: auto;
 }
-.content{ padding: 22px; min-width: 0; } /* min-width:0 防止撐破 */
+.content{ padding: 22px; min-width: 0; }
 .loading{ color: var(--muted); }
 
 /* 側欄清單 */
 .nav-group{ margin-bottom: 18px; }
 .nav-group-title{
-  font-size: 13px; color: var(--muted);
-  text-transform: uppercase; letter-spacing: .08em; margin: 8px 0;
+  font-size: 1.1rem; font-weight: 700; color: var(--fg);
+  margin: 12px 0 6px; text-transform: none; letter-spacing: 0.02em;
 }
 .nav-item{
   display: block; padding: 6px 8px; border-radius: 8px; color: var(--fg);
 }
 .nav-item.active, .nav-item:hover{ background: rgba(127,127,127,.08); }
+
+/* 摺疊箭頭（群組可收合） */
+.nav-group-title.collapsible{ cursor: pointer; position: relative; padding-right: 18px; }
+.nav-group-title.collapsible::after{
+  content: "▸"; position: absolute; right: 0; top: 0;
+  color: var(--flow-border); font-size: 1.1rem; transition: transform .2s ease;
+}
+.nav-group-title.collapsible.open::after{ transform: rotate(90deg); }
+.nav-group-items{ margin-left: 0; }
 
 /* ==========================================================================
    4) 文章通用樣式（圖片 / 行內程式碼 / 一般 code block）
@@ -113,14 +139,12 @@ a:hover{ text-decoration: underline; }
 .content img, .content iframe{
   max-width: 100%; height: auto; border-radius: var(--radius);
 }
-.content code:not(pre code){            /* 行內小片段 `code` */
+.content code:not(pre code){
   background: rgba(127,127,127,.15); padding: 2px 6px; border-radius: 6px;
 }
 :root[data-theme="dark"] .content code:not(pre code){
-  background: rgba(255,255,255,.12);  /* 暗色降低透明度 */
+  background: rgba(255,255,255,.12);
 }
-
-/* 一般 code block（非 flow） */
 .content pre{
   background: #0f172a; color: #e2e8f0;
   padding: 14px; border-radius: var(--radius);
@@ -132,50 +156,43 @@ a:hover{ text-decoration: underline; }
    5) 表格（有邊框 + 不被長字撐爆）
    -------------------------------------------------------------------------- */
 .content table{
-  width: 100%; table-layout: fixed;        /* 固定欄寬，避免長字撐爆 */
+  width: 100%; table-layout: fixed;
   border-collapse: collapse;
-  border: 1px solid var(--border);         /* 外框線跟著主題變色 */
+  border: 1px solid var(--border);
   margin: var(--space-4) 0;
 }
 .content th, .content td{
-  border: 1px solid var(--border);         /* 每格線條 */
+  border: 1px solid var(--border);
   padding: 6px 10px; text-align: left;
   word-break: break-word; white-space: normal;
-  color: var(--fg);                         /* 文字跟著主題色 */
+  color: var(--fg);
 }
-/* 表頭底色：亮/暗主題各自維持對比 */
 .content th{ background: #f5f5f5; }
 :root[data-theme="dark"] .content th{ background: #111827; }
 
-/* 摺疊詳情區 */
 .content details{ margin: 8px 0 16px; }
 
 /* ==========================================================================
-   6) 流程圖（flow code block 為主；flow-block 為備援）
+   6) 流程圖（flow code block）與備援 flow-block
    -------------------------------------------------------------------------- */
-/* 推薦寫法：```flow fenced code block */
 .content pre code.language-flow{
   display: block;
   background: var(--flow-bg);
   border: 2px solid var(--flow-border);
   border-radius: var(--radius);
   padding: 16px 20px;
-  font-size: 1.15rem;          /* 流程圖字大一點 */
+  font-size: 1.15rem;
   line-height: 1.8;
   white-space: pre-wrap; word-break: break-word;
-  color: var(--fg);             /* 文字顏色跟主題 */
+  color: var(--fg);
 }
-/* 自動加「流程圖：」標籤 */
 .content pre code.language-flow::before{
   content: "流程圖：";
   display: block; font-weight: 700; margin-bottom: 8px; color: var(--flow-border);
 }
-/* 外層 pre 去底色（瀏覽器若不支援 :has，拿掉也不影響可讀） */
 .content pre:has(code.language-flow){
   background: transparent; border: none; padding: 0; margin: var(--space-5) 0;
 }
-
-/* 備援寫法：<div class="flow-block"> 包 code block */
 .flow-block{
   background: var(--flow-bg);
   border: 2px solid var(--flow-border);
@@ -192,7 +209,6 @@ a:hover{ text-decoration: underline; }
 
 /* ==========================================================================
    7) 標題（H1~H3）
-   - 想調大小：改上面變數 --h1 / --h2 / --h3 即可
    -------------------------------------------------------------------------- */
 .content h1, .content h2, .content h3{ margin-top: 1.4em; color: var(--fg); }
 .content h1{
@@ -226,91 +242,65 @@ a:hover{ text-decoration: underline; }
 @keyframes popIn{ from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
 
 /* ==========================================================================
-   9) RWD
+   9) 左欄整欄收合：滑動動畫（含可及性）
    -------------------------------------------------------------------------- */
-@media (max-width: 900px){
-  .layout{ grid-template-columns: 1fr; }
-  .sidebar{ position: sticky; top: 52px; }
+.layout{
+  transition: grid-template-columns .28s ease; /* 欄寬過渡 */
 }
-/* 摺疊群組的外觀與箭頭 */
-.nav-group-title.collapsible {
-  cursor: pointer;
-  position: relative;
-  padding-right: 18px;
+.sidebar{
+  transition: transform .28s ease, opacity .2s ease, padding .2s ease, border-color .2s ease;
+  will-change: transform, opacity;
 }
-.nav-group-title.collapsible::after {
-  content: "▸";
-  position: absolute;
-  right: 0; top: 0;
-  color: var(--muted);
-  transition: transform .2s ease;
+body.sidebar-collapsed .layout{
+  grid-template-columns: 0px 1fr;               /* 收合：左欄寬度為 0 */
 }
-.nav-group-title.collapsible.open::after {
-  transform: rotate(90deg);
-}
-.nav-group-items { margin-left: 0; }
-/* ==== 側欄群組標題==== */
-.nav-group-title {
-  font-size: 1.1rem;           /* 原本約 13px，現在變大 */
-  font-weight: 700;            /* 加粗 */
-  color: var(--fg);            /* 用主文字色，亮暗主題都可讀 */
-  margin: 12px 0 6px;
-  text-transform: none;        /* 移除全大寫 */
-  letter-spacing: 0.02em;      /* 稍微增加間距 */
-}
-
-/* 若想讓群組之間更明顯分隔，可加底線或背景 */
-/* .nav-group {
-  padding-top: 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-} */
-
-/* 摺疊箭頭顯示更清楚 */
-.nav-group-title.collapsible::after {
-  content: "▸";
-  position: absolute;
-  right: 0;
-  top: 0;
-  color: var(--flow-border);    /* 改為主題色強調箭頭 */
-  font-size: 1.1rem;
-  transition: transform 0.2s ease;
-}
-.nav-group-title.collapsible.open::after {
-  transform: rotate(90deg);
-}
-/* 標題可點 */
-.brand {
-  cursor: pointer;
-  text-decoration: none;
-  color: var(--fg);
-}
-/* ==== 整個側欄的收合狀態 ==== */
-.layout {
-  transition: grid-template-columns 0.2s ease;
-}
-body.sidebar-collapsed .layout {
-  grid-template-columns: 0 1fr;     /* 直接把左欄寬度壓成 0 */
-}
-
-/* 收合時隱藏側欄與邊框、內距 */
-body.sidebar-collapsed .sidebar {
+body.sidebar-collapsed .sidebar{
+  transform: translateX(-12px);
+  opacity: 0;
   padding: 0;
-  border: 0;
-  width: 0;
-  overflow: hidden;
+  border-color: transparent;
+  overflow: hidden;                              /* 收合時不顯示內容 */
 }
 
-/* 右上角的收合按鈕造型（和主題按鈕一致風格） */
-#sidebarToggle {
+/* 收合按鈕 */
+#sidebarToggle{
   border: 1px solid var(--border);
   background: transparent;
   color: var(--fg);
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
-  margin-right: 8px;   /* 放在 🌗 左邊 */
+  margin-right: 8px; /* 在 🌗 左邊 */
 }
-#sidebarToggle:hover {
-  background: rgba(127,127,127,.08);
+#sidebarToggle:hover{ background: rgba(127,127,127,.08); }
+
+/* 尊重「減少動態」偏好：關閉過渡 */
+@media (prefers-reduced-motion: reduce){
+  .layout, .sidebar{ transition: none !important; }
+}
+
+/* ==========================================================================
+   10) RWD
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px){
+  .layout{ grid-template-columns: 1fr; }
+  .sidebar{
+    top: var(--topbar-h);
+    height: calc(100vh - var(--topbar-h));
+  }
+}
+/* 讓頂欄完全固定在視窗最上方（覆蓋先前的 sticky 設定） */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;              /* 或用 width: 100%; 也可 */
+  height: var(--topbar-h);
+  z-index: 1000;         /* 在最上層 */
+  background: var(--bg); /* 防止透明時看到底下內容 */
+}
+
+/* 避免頂欄蓋住內容，整個頁面往下推一個頂欄高度 */
+body {
+  padding-top: var(--topbar-h);
 }

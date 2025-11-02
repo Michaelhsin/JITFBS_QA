@@ -1,51 +1,72 @@
 (() => {
-  const contentEl = document.getElementById('content');
-  const navEl = document.getElementById('sidebarNav') || document.createElement('div');
+  const contentEl = document.getElementById('content') || document.querySelector('.content');
+  // 更穩定：先找 #sidebarNav，找不到就用 .sidebar
+  const navEl = document.getElementById('sidebarNav') || document.querySelector('.sidebar');
   const themeToggle = document.getElementById('themeToggle');
   const htmlEl = document.documentElement;
-  // === Sidebar 收合/展開 ===
+
+  /* -----------------------------
+     整欄側欄：收合 / 展開（含動畫、記憶狀態與捲動位置）
+     ----------------------------- */
   document.addEventListener('DOMContentLoaded', () => {
-    const layout = document.querySelector('.layout');
+    const layout  = document.querySelector('.layout');
     const sidebar = document.querySelector('.sidebar');
     const actions = document.querySelector('.actions');
-
     if (!layout || !sidebar || !actions) return;
 
     // 建立按鈕（放在右上角 actions 區，與 🌗 並排）
     const btn = document.createElement('button');
     btn.id = 'sidebarToggle';
     btn.title = '收合/展開側欄';
-    btn.textContent = '⟨⟩';           // 你要可改成「≡」或「⮜ / ⮞」
     actions.prepend(btn);
 
-    // 還原上次狀態
     const KEY = 'sidebarCollapsed';
     const collapsed = localStorage.getItem(KEY) === '1';
     document.body.classList.toggle('sidebar-collapsed', collapsed);
-    btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
 
-    // 點擊切換
+    // 初始化圖示與 ARIA
+    btn.textContent = collapsed ? '⮞' : '⮜';
+    btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+    btn.title = collapsed ? '展開側欄' : '收合側欄';
+
     btn.addEventListener('click', () => {
+      // 記住目前左欄捲動位置，避免展開後回到頂端
+      const y = sidebar.scrollTop;
+
       const willCollapse = !document.body.classList.contains('sidebar-collapsed');
       document.body.classList.toggle('sidebar-collapsed', willCollapse);
       localStorage.setItem(KEY, willCollapse ? '1' : '0');
       btn.setAttribute('aria-pressed', willCollapse ? 'true' : 'false');
+
+      // 狀態提示：收合→⮞、展開→⮜
+      btn.textContent = willCollapse ? '⮞' : '⮜';
+      btn.title = willCollapse ? '展開側欄' : '收合側欄';
+
+      // 展開後把捲動位置復原
+      requestAnimationFrame(() => {
+        if (!document.body.classList.contains('sidebar-collapsed')) {
+          sidebar.scrollTop = y;
+        }
+      });
     });
   });
 
+  /* -----------------------------
+     點品牌回首頁
+     ----------------------------- */
   document.addEventListener('DOMContentLoaded', () => {
     const brand = document.querySelector('.brand');
     if (brand) {
-     brand.style.cursor = 'pointer';
-     brand.addEventListener('click', () => {
-      location.hash = '#introoverview.md';
-    });
-  }
+      brand.style.cursor = 'pointer';
+      brand.addEventListener('click', () => {
+        location.hash = '#introoverview.md';
+      });
+    }
   });
 
-  /* =========================
-     題示：深/淺色主題切換
-     ========================= */
+  /* -----------------------------
+     深/淺色主題切換
+     ----------------------------- */
   const savedTheme = localStorage.getItem('theme') || 'light';
   htmlEl.setAttribute('data-theme', savedTheme);
   themeToggle?.addEventListener('click', () => {
@@ -54,18 +75,18 @@
     localStorage.setItem('theme', next);
   });
 
-  /* =========================
-     題示：Marked 設定（若有）
-     ========================= */
+  /* -----------------------------
+     Marked 設定（若有）
+     ----------------------------- */
   if (window.marked) {
     marked.setOptions({ mangle: false, headerIds: false });
   }
 
   let manifest = null;
 
-  /* =========================
+  /* -----------------------------
      載入 manifest.json
-     ========================= */
+     ----------------------------- */
   fetch('./content/manifest.json', { cache: 'no-cache' })
     .then(r => {
       if (!r.ok) throw new Error(`載入 manifest.json 失敗，HTTP ${r.status}`);
@@ -73,9 +94,8 @@
     })
     .then(json => {
       manifest = json;
-      if (navEl && navEl.id === 'sidebarNav') {
-        renderSidebar(json);
-      }
+      // 只要拿得到 navEl 就渲染（不再限制一定是 #sidebarNav）
+      if (navEl) renderSidebar(json);
       route();
       window.addEventListener('hashchange', route);
     })
@@ -84,59 +104,44 @@
       console.error(err);
     });
 
-  /* =========================
-     側欄：可摺疊群組
-     - 預設全部摺疊
-     - 點群組標題展開/收合
-     - 記住展開狀態（localStorage）
-     - 自動展開目前頁面所在群組
-     ========================= */
+  /* -----------------------------
+     側欄：群組可摺疊（記住展開狀態）
+     ----------------------------- */
   function renderSidebar(data) {
     navEl.innerHTML = '';
 
-    // 從 localStorage 還原展開的群組
     const OPEN_KEY = 'sidebarOpenGroups';
     const opened = new Set(JSON.parse(localStorage.getItem(OPEN_KEY) || '[]'));
-
-    // 目前路徑（用於渲染後自動開啟所在群組）
     const currentPath = location.hash.slice(1) || data?.default || data?.groups?.[0]?.items?.[0]?.path;
 
-    data.groups.forEach(group => {
+    (data.groups || []).forEach(group => {
       const groupContainer = document.createElement('div');
       groupContainer.className = 'nav-group';
 
-      // 群組標題
       const groupTitle = document.createElement('div');
       groupTitle.className = 'nav-group-title collapsible';
       groupTitle.textContent = group.title;
 
-      // 子項容器
       const itemsContainer = document.createElement('div');
       itemsContainer.className = 'nav-group-items';
-      itemsContainer.style.display = 'none'; // 預設摺疊
+      itemsContainer.style.display = 'none';
 
-      // 生成子項
       (group.items || []).forEach(item => {
-        const itemLink = document.createElement('a');
-        itemLink.href = `#${item.path}`;
-        itemLink.textContent = item.title;
-        itemLink.className = 'nav-item';
-        itemsContainer.appendChild(itemLink);
+        const a = document.createElement('a');
+        a.href = `#${item.path}`;
+        a.textContent = item.title;
+        a.className = 'nav-item';
+        itemsContainer.appendChild(a);
       });
 
-      // 點擊群組標題切換
       groupTitle.addEventListener('click', () => {
         const willOpen = itemsContainer.style.display !== 'block';
         itemsContainer.style.display = willOpen ? 'block' : 'none';
         groupTitle.classList.toggle('open', willOpen);
-
-        // 記住展開狀態
-        if (willOpen) opened.add(group.title);
-        else opened.delete(group.title);
+        if (willOpen) opened.add(group.title); else opened.delete(group.title);
         localStorage.setItem(OPEN_KEY, JSON.stringify([...opened]));
       });
 
-      // 若該群組包含目前頁面 → 強制展開
       const containsCurrent = (group.items || []).some(it => it.path === currentPath);
       if (containsCurrent || opened.has(group.title)) {
         itemsContainer.style.display = 'block';
@@ -144,29 +149,27 @@
         opened.add(group.title);
       }
 
-      // 組裝
       groupContainer.appendChild(groupTitle);
       groupContainer.appendChild(itemsContainer);
       navEl.appendChild(groupContainer);
     });
 
-    // 同步 active 樣式
     markActive();
   }
 
-  /* =========================
+  /* -----------------------------
      將目前頁面對應的連結加上 .active
-     ========================= */
+     ----------------------------- */
   function markActive() {
     const hash = location.hash.slice(1);
-    [...document.querySelectorAll('.nav-item')].forEach(a => {
+    document.querySelectorAll('.nav-item').forEach(a => {
       a.classList.toggle('active', a.getAttribute('href') === `#${hash}`);
     });
   }
 
-  /* =========================
-     路由：根據 hash 載入對應 Markdown
-     ========================= */
+  /* -----------------------------
+     路由
+     ----------------------------- */
   function route() {
     const first = manifest?.default || manifest?.groups?.[0]?.items?.[0]?.path;
     const hash = location.hash.slice(1) || first;
@@ -177,14 +180,15 @@
     loadMarkdown(hash);
     markActive();
 
-    // 導航：自動展開目前頁面的群組（避免使用者從其他頁跳轉時看不到子項）
+    // 進頁後自動展開所在群組
     const OPEN_KEY = 'sidebarOpenGroups';
     const opened = new Set(JSON.parse(localStorage.getItem(OPEN_KEY) || '[]'));
-    [...document.querySelectorAll('.nav-group')].forEach(groupEl => {
+    document.querySelectorAll('.nav-group').forEach(groupEl => {
       const titleEl = groupEl.querySelector('.nav-group-title');
       const itemsEl = groupEl.querySelector('.nav-group-items');
       if (!titleEl || !itemsEl) return;
-      const hasCurrent = [...itemsEl.querySelectorAll('a.nav-item')].some(a => a.getAttribute('href') === `#${hash}`);
+      const hasCurrent = [...itemsEl.querySelectorAll('a.nav-item')]
+        .some(a => a.getAttribute('href') === `#${hash}`);
       if (hasCurrent) {
         itemsEl.style.display = 'block';
         titleEl.classList.add('open');
@@ -194,10 +198,9 @@
     localStorage.setItem(OPEN_KEY, JSON.stringify([...opened]));
   }
 
-  /* =========================
-     Markdown 內容渲染輔助
-     - 自動補標題 id（方便內頁錨點）
-     ========================= */
+  /* -----------------------------
+     內頁工具：自動補標題 id
+     ----------------------------- */
   function slugify(str) {
     return String(str)
       .normalize('NFKD')
@@ -226,9 +229,31 @@
     return tmp.innerHTML;
   }
 
-  /* =========================
-     載入 Markdown 檔案
-     ========================= */
+  /* -----------------------------
+     讓內容內的 .md 連結自動走 hash（避免 404）
+     ----------------------------- */
+  function enableContentLinkRouting() {
+    if (!contentEl) return;
+    contentEl.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (!a) return;
+      const href = a.getAttribute('href') || '';
+
+      // 外部連結 / 已是 hash / javascript: → 不處理
+      if (/^https?:\/\//i.test(href) || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+      // 只攔站內 .md，轉成 hash 路由
+      if (href.endsWith('.md')) {
+        e.preventDefault();
+        const normalized = href.replace(/^\.?\/?content\//, '');
+        location.hash = `#${normalized}`;
+      }
+    }, { passive: false });
+  }
+
+  /* -----------------------------
+     載入 Markdown 檔
+     ----------------------------- */
   function loadMarkdown(path) {
     const url = `./content/${path}`;
     if (contentEl) contentEl.innerHTML = `<div class="loading">載入內容中…</div>`;
@@ -253,7 +278,10 @@
           `;
           return;
         }
-        if (contentEl) contentEl.innerHTML = renderMarkdownTo(html);
+        if (contentEl) {
+          contentEl.innerHTML = renderMarkdownTo(html);
+          enableContentLinkRouting(); // 讓內文連結走 hash
+        }
         window.scrollTo({ top: 0, behavior: 'instant' });
       })
       .catch(err => {
