@@ -167,6 +167,8 @@ a:hover{ text-decoration: underline; }
   word-break: break-word; white-space: normal;
   color: var(--fg);
 }
+.content table th:nth-child(1), /* 只針對第一欄（No.）調整 */
+.content table td:nth-child(1) { width: 3em; }
 .content th{ background: #f5f5f5; }
 :root[data-theme="dark"] .content th{ background: #111827; }
 

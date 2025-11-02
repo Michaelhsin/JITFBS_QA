@@ -10,7 +10,7 @@
 <summary><strong>📦 Pre-sort 初分揀</strong></summary>
 
 **流程：**  
-刷區域 QR code → 刷 ASN / Seller TO / SPTO → 看商品外觀 → 刷商品 UPC / SKUID → PDA 顯示工位 → 播種牆亮燈 → 投入揀貨箱 →  拍燈 → 綁箱（刷工位 QRcode → 刷 Device ID → 綁箱成功）
+刷區域 QR code → 刷 ASN / Seller TO / SPTO → 看商品外觀 → 刷商品 UPC / SKUID → PDA 顯示工位 → 播種牆亮燈 → 投入揀貨箱 → 拍燈 → 綁箱(步驟1. 刷工位 QRcode → 步驟2. 刷 Device ID) → 綁箱成功）
 
 **可能錯誤：**  
 此區域已超過三人、無區域資料、container_no 尚無資料、  
@@ -26,7 +26,7 @@
 <summary><strong>🧾 分貨</strong></summary>
 
 **流程：**  
-開分貨模組 → 刷 Device ID  
+開啟分貨模組 → 刷 Device ID → PDA顯示對應Mainsort撥種牆編號 → 推至分貨區地面對應編號 → 疊箱 → 待滿落時，推至對應Mainsort撥種牆 → 分貨完成
 
 **可能錯誤：**  
 此揀貨箱尚未有訂單，此為空箱、刷讀內容非揀貨箱號格式、  
@@ -42,7 +42,7 @@
 <summary><strong>🏗️ Main-sort 主分揀</strong></summary>
 
 **流程：**  
-刷區域 QR code → 刷 Device ID → 刷商品 UPC / SKUID → PDA 顯示工位 → 播種牆亮燈 → 拍燈 → 關箱（刷區域 QR code → 刷 TO 單）
+刷區域 QR code → 刷 Device ID → 刷商品 SKUID → PDA 顯示工位、播種牆亮燈 → 拍燈 → 關箱(步驟1. 刷區域 QR code → 步驟2. 刷 TO 單) → 綁箱成功
 
 **可能錯誤：**  
 此區域已超過三人、無區域資料、此揀貨箱尚未有訂單、  
