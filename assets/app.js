@@ -280,6 +280,44 @@
         }
         if (contentEl) {
           contentEl.innerHTML = renderMarkdownTo(html);
+          if (contentEl) {
+            contentEl.innerHTML = renderMarkdownTo(html);
+            enhanceTables(contentEl);     // ← 新增：強化表格（加 class / colgroup）
+            enableContentLinkRouting();   // 既有：讓內文連結走 hash
+          }
+          function enhanceTables(rootEl){
+            if (!rootEl) return;
+            const tables = rootEl.querySelectorAll('table');
+            tables.forEach(tbl => {
+              tbl.classList.add('tbl'); // 統一表格基礎樣式
+
+              // 找第一列表頭文字
+              const firstTh = tbl.querySelector('thead th, tr th');
+              const label = (firstTh?.textContent || '').trim().toLowerCase();
+
+              // 符合「No. / # / 序號」等關鍵字才加固定寬度欄
+              const isNoCol = /^(no\.?|#|序號)$/.test(label);
+              if (isNoCol) {
+                tbl.classList.add('tbl--has-no');
+
+                // 若沒有 colgroup，建立並插入
+                if (!tbl.querySelector('colgroup')) {
+                  const colgroup = document.createElement('colgroup');
+                  const cols = (tbl.querySelectorAll('tr:first-child th, tr:first-child td').length) || 1;
+                  for (let i = 0; i < cols; i++){
+                    const col = document.createElement('col');
+                    if (i === 0) col.className = 'col-no';
+                    colgroup.appendChild(col);
+                  }
+                  tbl.insertBefore(colgroup, tbl.firstChild);
+                } else {
+                  // 已有 colgroup，確保第一個 <col> 有 col-no
+                  const firstCol = tbl.querySelector('colgroup col');
+                  if (firstCol) firstCol.classList.add('col-no');
+                }
+              }
+            });
+          }
           enableContentLinkRouting(); // 讓內文連結走 hash
         }
         window.scrollTo({ top: 0, behavior: 'instant' });
