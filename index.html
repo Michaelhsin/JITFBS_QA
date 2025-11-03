@@ -47,16 +47,27 @@
 </script>
 <script src="https://udify.app/embed.min.js" id="QtJjyZNfith51lD3" defer></script>
 <style>
-  /* 外觀可自訂 */
+  /* 氣泡按鈕（可用 CSS 變數微調位置與尺寸） */
   #dify-chatbot-bubble-button {
-    background-color: #ff7337 !important;
-    border: none !important;
-    box-shadow: 0 4px 10px rgba(246,145,19,0.4) !important;
+    --dify-chatbot-bubble-button-right: 1rem;
+    --dify-chatbot-bubble-button-bottom: 1rem;
+    /* 你的配色 */
+    --dify-chatbot-bubble-button-bg-color: #ff7337;
+    --dify-chatbot-bubble-button-box-shadow: 0 4px 10px rgba(246,145,19,0.4);
   }
+
+  /* 聊天視窗：固定在右下角 */
   #dify-chatbot-bubble-window {
+    position: fixed !important;
+    right: 1rem !important;
+    bottom: 5rem !important; /* 與按鈕錯開一點 */
     width: 24rem !important;
     height: 40rem !important;
-    z-index: 9999 !important; /* 確保浮在頁面元件之上 */
+    max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 6rem) !important;
+    z-index: 2147483647 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2) !important;
   }
 </style>
 
