@@ -281,6 +281,7 @@
         if (contentEl) {
           contentEl.innerHTML = renderMarkdownTo(html);
           enableContentLinkRouting(); // 讓內文連結走 hash
+          document.body.dataset.page = path.replace('.md', '');
         }
         window.scrollTo({ top: 0, behavior: 'instant' });
       })

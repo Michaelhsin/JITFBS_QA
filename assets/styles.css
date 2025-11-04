@@ -306,3 +306,12 @@ body.sidebar-collapsed .sidebar{
 body {
   padding-top: var(--topbar-h);
 }
+/* 僅調整 sop_log.md 的欄寬 */
+body[data-page="sop_log"] .content table {
+  table-layout: auto;  /* 讓欄位寬度自動依內容 */
+}
+
+body[data-page="sop_log"] .content th:nth-child(2),
+body[data-page="sop_log"] .content td:nth-child(2) {
+  width: 2.5em; /* 例如調整第一欄寬 */
+}
