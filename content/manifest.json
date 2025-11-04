@@ -24,6 +24,12 @@
       "items": [
         { "title": "Main-sort 流程與異常SOP", "path": "Main-sort/overview.md" }
       ]
+    },
+    {
+  "title": "log\n歷程",
+  "items": [
+      { "title": "SOP異動歷程", "path": "log/sop_log.md" }
+      ]
     }
   ]
 }
