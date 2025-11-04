@@ -279,19 +279,35 @@
           return;
         }
         if (contentEl) {
+          // 先移除舊的 page 標記
+          document.body.removeAttribute('data-page');
+          
           contentEl.innerHTML = renderMarkdownTo(html);
           enableContentLinkRouting(); // 讓內文連結走 hash
-          document.body.dataset.page = path.replace('.md', '');
+          
+          // 在下一個渲染週期設定 data-page,確保 DOM 已更新
+          requestAnimationFrame(() => {
+            // 取得檔案名稱,處理可能的路徑
+            const pageName = path.split('/').pop().replace('.md', '');
+            document.body.dataset.page = pageName;
+            
+            // 除錯用:可以看到目前頁面名稱
+            console.log('✓ 已載入頁面:', pageName);
+          });
         }
         window.scrollTo({ top: 0, behavior: 'instant' });
       })
       .catch(err => {
         console.error(err);
-        if (contentEl) contentEl.innerHTML = `
+        if (contentEl) {
+          // 錯誤時也要清除 data-page
+          document.body.removeAttribute('data-page');
+          contentEl.innerHTML = `
           <h1>找不到頁面</h1>
           <p>請求：<code>${url}</code></p>
           <pre>${String(err.message || err)}</pre>
         `;
+        }
       });
   }
 })();
