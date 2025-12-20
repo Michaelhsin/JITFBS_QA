@@ -315,3 +315,10 @@ body[data-page="sop_log"] .content th:nth-child(2),
 body[data-page="sop_log"] .content td:nth-child(2) {
   width: 6.5em !important; /* 例如調整第二欄寬 */
 }
+.content img,
+.content video {
+  max-width: 400px;
+  width: 100%;
+  display: block;
+  margin: 20px auto;
+}
