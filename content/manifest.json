@@ -8,6 +8,12 @@
       ]
     },
     {
+      "title": "Item Sorter",
+      "items": [
+        {"title": "楊梅Item Sorter SOP", "path": "Item Sorter/SOP.md"}
+      ]
+    }
+    {
       "title": "Pre-sort\n初分揀",
       "items": [
         { "title": "Pre-sort 流程與異常SOP", "path": "Pre-sort/overview.md" }
