@@ -109,7 +109,8 @@
 - 禁運品
 
 **處理方式**
-- 不可刷碼
+- 不可刷碼(萬一不小心刷到條碼，請在螢幕點選 **取消**)
+<video src="/assets/images/press_cancel.mp4" controls playsinline></video>
 - 直接放回原 Seller TO 箱
 - 後續流程：
   - 專門驗收異常 Presort 播種牆
@@ -150,8 +151,7 @@
   - 系統仍可刷（Seller TO 為 `1_xxx`）
   - ⚠️ 後續會請廠商修正
 - 誤刷賣家自製 UPC：
-  - 系統跳錯誤訊息 **3 秒**
-  - ⚠️ 會建議調整為 **1 秒**
+  - 系統跳錯誤訊息 **1 秒**
 
 ### 📹 刷箱刷商品示範影片
 <video src="/assets/images/scan_to.mp4" controls playsinline></video>
